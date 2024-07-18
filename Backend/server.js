@@ -5,6 +5,8 @@ import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.route.js"
 import {v2 as cloudinary} from "cloudinary";
+import postRoute from "./routes/post.route.js"; 
+
 dotenv.config();
 
 
@@ -30,6 +32,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/posts",postRoute);
 
 app.listen(PORT, () => {
     console.log(`Server is listening at ${PORT}`);
