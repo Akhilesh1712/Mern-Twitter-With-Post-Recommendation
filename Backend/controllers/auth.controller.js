@@ -23,11 +23,12 @@ export const signup = async (req, res) => {
         if (existEmail) {
             return res.status(400).json({ error: "Email already exists, please login" });
         }
-        
 
-        if(password.length < 8){
-            return res.status(400).json({error: "Password should be atleast 8 characters"});
+        // Validate password length
+        if (password.length < 8) {
+            return res.status(400).json({ error: "Password should be at least 8 characters" });
         }
+
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -37,26 +38,28 @@ export const signup = async (req, res) => {
             fullName,
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         });
 
         // Save new user and generate token
         await newUser.save();
         generateTokenandSetCookie(newUser._id, res);
-        
-        res.status(201).json({ _id:user._id,
-            fullName: user.fullName,
-            username: user.username,
-            email: user.email,
-            followers:user.followers,
-            following: user.following,
-            profileImg: user.profileImg,
-            coverImg: user.coverImg, });
-        
+
+        res.status(201).json({
+            _id: newUser._id,
+            fullName: newUser.fullName,
+            username: newUser.username,
+            email: newUser.email,
+            followers: newUser.followers,
+            following: newUser.following,
+            profileImg: newUser.profileImg,
+            coverImg: newUser.coverImg,
+        });
+
     } catch (error) {
         res.status(500).json({ error: `Internal server error: ${error.message}` });
     }
-}
+};
 
 
 export const login = async (req, res) => {
