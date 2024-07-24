@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT  || 8000;
 
 // Middleware to parse JSON bodies
-app.use(express.json());
+app.use(express.json({limit: "4mb"})); //it shoud not too large other can be user dos(denial of service)
 
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
