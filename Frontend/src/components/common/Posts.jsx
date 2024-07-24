@@ -53,8 +53,8 @@ const Posts = ({feedPost}) => {
 					<PostSkeleton />
 				</div>
 			)}
-			{!isLoading && data?.length === 0 && <p className='text-center my-4'>No posts in this tab. Switch 👻</p>}
-			{!isLoading && data && (
+			{!isLoading && !isRefetching && data?.length === 0 && <p className='text-center my-4'>No posts in this tab. Switch 👻</p>}
+			{!isLoading && !isRefetching && data && (
 				<div>
 					{data.map((post) => (
 						<Post key={post._id} post={post} />
