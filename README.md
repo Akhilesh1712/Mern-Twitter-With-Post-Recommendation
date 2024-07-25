@@ -100,4 +100,4 @@ This is a full-stack Twitter clone application with user post recommendations. T
 
      ### NOTE 1 : The frontend development server will start on http://localhost:3000.
 
-     ### NOTE 2 : I have uses the [Cloudinary](https://cloudinary.com/) for images so you also have to create profile there.
+     ### NOTE 2 : I have uses the [Cloudinary](https://cloudinary.com/) for images so you also have to create profile there. And for databases uses Mongodb [MongoDB](https://www.mongodb.com/).
