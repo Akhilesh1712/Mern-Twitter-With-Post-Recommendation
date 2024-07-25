@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {toast} from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
+import { formatPostDate } from "../../utils/date/function";
+//import { text } from "express";
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
@@ -68,6 +70,41 @@ const Post = ({ post }) => {
 			toast.error(error.message);
 		}
 	})
+    
+    const {mutate: commentPost,isPending:isCommenting} = useMutation({
+          mutationFn: async () => {
+			try {
+				const res = await fetch(`/api/posts/comment/${post._id}`,{
+					method: "POST" ,
+					//The headers object in your fetch request is used to specify the type of content that is being sent to the server. Here's what this specific line does:
+					//Content-Type: This header tells the server the format of the data being sent in the request body.
+                    //application/json: This value indicates that the data being sent is in JSON format.
+					//When you include this header in your request, it informs the server that the body of your request will contain JSON data. 
+					headers:{
+						"Content-Type" : "application/json",
+					},
+					body: JSON.stringify({text: comment}), //sets comment this in useState
+					//JSON.stringify converts a JavaScript object into a JSON string.
+				})
+				const data = await res.json();
+
+				if(!res.ok){
+					throw new Error(data.error || "Something wrong");
+				}
+				return data;
+			} catch (error) {
+				throw new Error(data.error);
+			}
+		  },
+		  onSuccess: () =>{
+			toast.success("Commented");
+			setComment("");
+			queryClient.invalidateQueries({queryKey: ["posts"]});
+		  },
+		  onError: () =>{
+			toast.error(error.message);
+		  }
+	})
 
 	const postOwner = post.user;
 	const isLiked = post.likes.includes(authUser._id);
@@ -75,9 +112,7 @@ const Post = ({ post }) => {
 
 	const isMyPost = authUser._id === post.user._id; //us post ka vo hi vo uploader hai
 
-	const formattedDate = "1h";
-
-	const isCommenting = false;
+	const formattedDate = formatPostDate(post.createdAt);
 
 	const handleDeletePost = () => {
 		deletePost();
@@ -85,6 +120,8 @@ const Post = ({ post }) => {
 
 	const handlePostComment = (e) => {
 		e.preventDefault();
+		if(isCommenting) return ;
+		commentPost();
 	};
 
 	const handleLikePost = () => {
