@@ -52,7 +52,9 @@ export const likeUnlikePost = async (req,res) =>{
             //unlike
             await Post.updateOne({_id:id}, {$pull: {likes : userId}});
             await User.updateOne({_id: userId}, {$pull: { likedPost: id}})
-            res.status(200).json({message: "Unliked"});
+
+            const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString());//creates a new array, updatedlikes, by filtering out the user's ID from the likes array of the post. This ensures the list of likes no longer includes the user who just unliked the post.
+            res.status(200).json(updatedLikes);//returns the updated list of likes (updatedlikes) in JSON format.
 
         } else{
            //like
@@ -68,8 +70,8 @@ export const likeUnlikePost = async (req,res) =>{
             type: "like"
            })
            await notification.save();
-
-           res.status(200).json({message: "Post liked"});
+           const updatedLikes = post.likes;
+           res.status(200).json(updatedLikes); //returns the updated likes array
         }
     } catch (error) {
         return res.status(500).json({error: `${error}`});
