@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
@@ -11,6 +11,8 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
+import { formatMemberSinceDate } from "../../utils/date/function";
 
 const ProfilePage = () => {
 
@@ -22,21 +24,29 @@ const ProfilePage = () => {
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const isLoading = false;
+    const {username} = useParams();
+   
+    
+
 	const isMyProfile = true;
+    
+	const {data:user,isLoading , refetch , isRefetching} = useQuery({
+        queryKey: ["userProfile"],
+        queryFn: async () => {
+			try {
+				const res = await fetch(`/api/users/profile/${username}`);
+				const  data = await res.json();
+				if(!res.ok){
+					throw new Error(data.error || "Something wrong");
+				}
 
-	const user = {
-		_id: "1",
-		fullName: "Akhilesh",
-		username: "akhil",
-		profileImg: "/avatars/boy2.png",
-		coverImg: "/cover.png",
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
-		following: ["1", "2", "3"],
-		followers: ["1", "2", "3"],
-	};
-
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
+		}
+	})
+    const membersince = formatMemberSinceDate(user?.createdAt);
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
 		if (file) {
@@ -49,14 +59,17 @@ const ProfilePage = () => {
 		}
 	};
 
+	useEffect(() =>{
+		refetch()
+	},[username,refetch,username]);
 	return (
 		<>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
 				{/* HEADER */}
-				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
+				{!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User not found</p>}
 				<div className='flex flex-col'>
-					{!isLoading && user && (
+					{!isLoading && !isRefetching && user && (
 						<>
 							<div className='flex gap-10 px-4 py-2 items-center'>
 								<Link to='/'>
@@ -100,7 +113,7 @@ const ProfilePage = () => {
 								{/* USER AVATAR */}
 								<div className='avatar absolute -bottom-16 left-4'>
 									<div className='w-32 rounded-full relative group/avatar'>
-										<img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
+										<img src={profileImg || user?.profileImg || "/avtar_place_holder.png"} />
 										<div className='absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer'>
 											{isMyProfile && (
 												<MdEdit
@@ -140,24 +153,9 @@ const ProfilePage = () => {
 								</div>
 
 								<div className='flex gap-2 flex-wrap'>
-									{user?.link && (
-										<div className='flex gap-1 items-center '>
-											<>
-												<FaLink className='w-3 h-3 text-slate-500' />
-												<a
-													href='https://youtube.com/@asaprogrammer_'
-													target='_blank'
-													rel='noreferrer'
-													className='text-sm text-blue-500 hover:underline'
-												>
-													youtube.com/@asaprogrammer_
-												</a>
-											</>
-										</div>
-									)}
 									<div className='flex gap-2 items-center'>
 										<IoCalendarOutline className='w-4 h-4 text-slate-500' />
-										<span className='text-sm text-slate-500'>Joined July 2021</span>
+										<span className='text-sm text-slate-500'>{membersince}</span>
 									</div>
 								</div>
 								<div className='flex gap-2'>
@@ -194,7 +192,7 @@ const ProfilePage = () => {
 						</>
 					)}
 
-					<Posts />
+					<Posts feedPost={feedType} username={username} userId={user?._id} />
 				</div>
 			</div>
 		</>

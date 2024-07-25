@@ -3,7 +3,7 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import {useQuery} from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const Posts = ({feedPost}) => {
+const Posts = ({feedPost,username,userId}) => {
 	
 
  
@@ -15,6 +15,10 @@ const Posts = ({feedPost}) => {
 		    case "following":
 				return "/api/posts/following";
 				break;
+			case "posts":
+				return `/api/posts/user/${username}`;
+			case "likes":
+				return `/api/posts/likes/${userId}`;		
 			default:
 				return "/api/posts/all";
 		}
