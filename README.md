@@ -12,9 +12,6 @@ This is a full-stack Twitter clone application with user post recommendations. T
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
-- [Scripts](#scripts)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
