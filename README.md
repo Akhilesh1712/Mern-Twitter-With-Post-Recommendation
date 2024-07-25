@@ -62,7 +62,7 @@ This is a full-stack Twitter clone application with user post recommendations. T
    cd twitter-clone
 2.**Backend Setup**
 
-      '''sh
+    
       cd Backend
       npm install
   Create a .env file in the Backend directory and add your environment variables:
