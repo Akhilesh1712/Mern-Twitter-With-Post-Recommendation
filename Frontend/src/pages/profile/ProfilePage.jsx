@@ -64,7 +64,7 @@ const ProfilePage = () => {
 	};
    
 
-	const {mutate:updatProfile,isPending: isUpdating} = useMutation({
+	const {mutateAsync:updatProfile,isPending: isUpdating} = useMutation({
 		mutationFn: async() => {
 			try {
 				const res = await fetch(`/api/users/update`,{
@@ -181,12 +181,18 @@ const ProfilePage = () => {
 								)}
 								{(coverImg || profileImg) && (
 									<button
-										className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-										onClick={() => updatProfile()}
-									>
-										{isUpdating ? "Updating...." : "Update"}
-
-									</button>
+									className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
+									onClick={async () => {
+										
+											await updatProfile({ coverImg, profileImg });
+											setCoverImg(null);
+											setProfileImg(null);
+										
+										
+									}}
+								>
+									{isUpdating ? "Updating...." : "Update"}
+								</button>
 								)}
 							</div>
 
